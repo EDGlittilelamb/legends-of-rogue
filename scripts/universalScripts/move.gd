@@ -23,6 +23,10 @@ func _physics_process(_delta: float) -> void:
 	legend.velocity = input_direction * move_speed
 	legend.move_and_slide()
 
+	# 空手拳击动画播放期间，不覆盖角色的攻击动画（移动逻辑不受影响）
+	if legend.get("is_punching"):
+		return
+
 	if input_direction != Vector2.ZERO:
 		_last_direction = input_direction.normalized()
 		_play_move_animation(_last_direction)

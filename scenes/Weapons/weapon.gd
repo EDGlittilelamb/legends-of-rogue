@@ -1,4 +1,4 @@
-extends Area2D
+extends Item
 class_name Weapon
 
 ## 武器动画约定：所有武器都有 "idle"（默认）和 "attack" 两个动画
@@ -17,6 +17,8 @@ const ATTACK_ANIM := "attack"
 
 var _fire_cooldown := 0.0
 var _attack_token := 0
+## 是否被玩家装备在手上；背包里的武器实例为 false，不会瞄准/旋转
+var is_equipped := false
 
 @onready var animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var _holder: Node2D = get_parent() as Node2D
@@ -30,6 +32,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not is_equipped:
+		return
 	_fire_cooldown = maxf(0.0, _fire_cooldown - delta)
 	_aim_at_mouse()
 
