@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbvkyw3s2f27n"]
+
+[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/legend.tscn" id="1_o5qli"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Legend" parent="Camera2D" instance=ExtResource("1_o5qli")]

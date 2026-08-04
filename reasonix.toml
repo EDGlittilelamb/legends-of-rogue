@@ -1,0 +1,2 @@
+[permissions]
+allow = ["Edit", "Bash=git -C \"F:\\game\\legends-of-rogue\" status 2>&1 | Select-Object -First 5", "Bash(git -C:*)"]

@@ -1,0 +1,80 @@
+[gd_scene load_steps=12 format=3 uid="uid://dggi4b4k68oab"]
+
+[ext_resource type="Texture2D" uid="uid://bu7hmk22ef41k" path="res://assets/guns/sniper.png" id="1_cndss"]
+[ext_resource type="Script" uid="uid://c3cqfcnfab0bc" path="res://scenes/Weapons/sniper/sniper.gd" id="2_snp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8foj5"]
+size = Vector2(0, 0)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_miel4"]
+atlas = ExtResource("1_cndss")
+region = Rect2(0, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_307xw"]
+atlas = ExtResource("1_cndss")
+region = Rect2(36, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hnnl1"]
+atlas = ExtResource("1_cndss")
+region = Rect2(72, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i1qe6"]
+atlas = ExtResource("1_cndss")
+region = Rect2(108, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sde1m"]
+atlas = ExtResource("1_cndss")
+region = Rect2(144, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b31vd"]
+atlas = ExtResource("1_cndss")
+region = Rect2(180, 0, 36, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t24ai"]
+atlas = ExtResource("1_cndss")
+region = Rect2(0, 0, 36, 14)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7w3vc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_miel4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_307xw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hnnl1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i1qe6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sde1m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b31vd")
+}],
+"loop": true,
+"name": &"attack",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t24ai")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 12.0
+}]
+
+[node name="sniper" type="Area2D"]
+script = ExtResource("2_snp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_8foj5")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_7w3vc")
+animation = &"idle"
