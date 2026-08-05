@@ -39,8 +39,12 @@ const ITEM_DROP_SCENE := preload("res://scenes/items/item_drop.tscn")
 @onready var weapon_holder: Node2D = $weapon
 
 
-func _ready() -> void:
+func _enter_tree() -> void:
+	# 尽早加入 group：子组件在 ENTER_TREE/@onready 阶段就要能查到玩家
 	add_to_group("player")
+
+
+func _ready() -> void:
 	hp = max_hp
 	inventory.resize(20)
 	for i in STARTING_WEAPONS.size():

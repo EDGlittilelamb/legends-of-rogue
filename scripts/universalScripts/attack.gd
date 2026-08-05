@@ -9,8 +9,14 @@ const PUNCH_RIGHT := "punch_right"
 const PUNCH_UP := "punch_up"
 const PUNCH_DOWN := "punch_down"
 
-@onready var player: Player = get_tree().get_first_node_in_group("player") as Player
-@onready var animated_sprite: AnimatedSprite2D = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
+var player: Player
+var animated_sprite: AnimatedSprite2D
+
+
+func _ready() -> void:
+	# 在 _ready 中获取玩家引用（@onready 阶段 player group 可能还未就绪）
+	player = get_tree().get_first_node_in_group("player") as Player
+	animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
 
 
 func _unhandled_input(event: InputEvent) -> void:

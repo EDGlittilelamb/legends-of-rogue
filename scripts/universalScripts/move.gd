@@ -11,10 +11,16 @@ const MOVE_LEFT := "move_left"
 const MOVE_RIGHT := "move_right"
 const MOVE_UP := "move_up"
 
-@onready var legend: CharacterBody2D = get_tree().get_first_node_in_group("player") as CharacterBody2D
-@onready var animated_sprite: AnimatedSprite2D = legend.get_node("AnimatedSprite2D") as AnimatedSprite2D
+var legend: CharacterBody2D
+var animated_sprite: AnimatedSprite2D
 
 var _last_direction: Vector2 = Vector2.DOWN
+
+
+func _ready() -> void:
+	# 在 _ready 中获取玩家引用（@onready 阶段 player group 可能还未就绪）
+	legend = get_tree().get_first_node_in_group("player") as CharacterBody2D
+	animated_sprite = legend.get_node("AnimatedSprite2D") as AnimatedSprite2D
 
 
 func _physics_process(_delta: float) -> void:
