@@ -28,8 +28,10 @@ var _drag_item: Item = null
 
 
 func _ready() -> void:
-	# 节点结构：Legend -> CanvasLayer -> BackpackUI
-	player = get_parent().get_parent() as Player
+	# 玩家引用改为 group 查找（节点树结构调整后不再依赖固定父子层级）
+	player = get_tree().get_first_node_in_group("player") as Player
+	# 背包内容变化（拾取/丢弃）时自动刷新物品摆放
+	player.inventory_changed.connect(_refresh_item_placement)
 	# 延迟一帧摆放物品：避免 _ready 阶段 add_child 的物品首帧未进入渲染队列
 	call_deferred("_refresh_item_placement")
 	queue_redraw()

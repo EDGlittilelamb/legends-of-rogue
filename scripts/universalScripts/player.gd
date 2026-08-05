@@ -9,6 +9,8 @@ class_name Player
 @export var defense: int = 0
 @export var attack: int = 10
 @export var initial_weapon_scene: PackedScene = preload("res://scenes/Weapons/minigun/minigun.tscn")
+## 控制模式：true = AI 控制（禁用 PlayerController），false = 玩家控制（禁用 AIController）
+@export var ai_controlled := false
 
 ## 背包初始武器（放入前三个格子）
 const STARTING_WEAPONS: Array[PackedScene] = [
@@ -21,13 +23,24 @@ var hp: int
 var current_weapon: Weapon
 ## 背包数据：固定 20 格（4 行 x 5 列），null 表示空格
 var inventory: Array[Item] = []
+## 背包内容变化时发出（拾取、丢弃等），背包 UI 监听后自动刷新
+signal inventory_changed
 ## 空手拳击动画播放中（move.gd 在此期间不覆盖动画）
 var is_punching := false
+## 角色已死亡（不再响应移动/攻击/受击）
+var is_dead := false
 
+## 死亡动画（测试阶段只播放这一个）
+const DIE_ANIM := "die_left"
+## 掉落物场景（死亡时掉落背包物品用）
+const ITEM_DROP_SCENE := preload("res://scenes/items/item_drop.tscn")
+
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var weapon_holder: Node2D = $weapon
 
 
 func _ready() -> void:
+	add_to_group("player")
 	hp = max_hp
 	inventory.resize(20)
 	for i in STARTING_WEAPONS.size():
@@ -37,6 +50,12 @@ func _ready() -> void:
 		equip_from_inventory(0)
 	else:
 		_equip_weapon(initial_weapon_scene)
+	# 按控制模式启用对应控制器（禁用会停掉子树全部处理，含输入/动画/背包 UI）
+	if ai_controlled:
+		$PlayerController.process_mode = Node.PROCESS_MODE_DISABLED
+		$AIController.process_mode = Node.PROCESS_MODE_INHERIT
+	else:
+		$AIController.process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func _equip_weapon(weapon_scene: PackedScene) -> void:
@@ -72,7 +91,19 @@ func _unequip_weapon() -> void:
 		current_weapon = null
 
 
+## 尝试把物品放入背包第一个空格；成功返回 true，背包满返回 false
+func add_item_to_inventory(item: Item) -> bool:
+	for i in inventory.size():
+		if inventory[i] == null:
+			inventory[i] = item
+			inventory_changed.emit()
+			return true
+	return false
+
+
 func take_damage(amount: int, attacker: Node2D = null) -> void:
+	if is_dead:
+		return
 	var final_damage := maxi(1, amount - defense)
 	hp -= final_damage
 	if hp <= 0:
@@ -80,5 +111,62 @@ func take_damage(amount: int, attacker: Node2D = null) -> void:
 		_die()
 
 
+## 死亡：掉落背包所有物品，播放死亡动画，播完后停留在最后一帧（尸体留在场景中）
 func _die() -> void:
-	queue_free()
+	if is_dead:
+		return
+	is_dead = true
+	# 隐藏尸体手上的武器
+	if current_weapon:
+		current_weapon.is_equipped = false
+		current_weapon.visible = false
+	_drop_all_inventory()
+	animated_sprite.play(DIE_ANIM)
+	var frames := animated_sprite.sprite_frames.get_frame_count(DIE_ANIM)
+	var speed := animated_sprite.sprite_frames.get_animation_speed(DIE_ANIM)
+	var duration := frames / speed if speed > 0.0 else 0.5
+	get_tree().create_timer(duration).timeout.connect(_on_death_animation_finished)
+
+
+## 把背包中所有物品作为掉落物，从角色中心抛出，均匀散落在角色周围
+func _drop_all_inventory() -> void:
+	var drops: Array[ItemDrop] = []
+	for i in inventory.size():
+		var item := inventory[i]
+		if item == null:
+			continue
+		# 从背包 UI 中移除旧实例，避免残留显示
+		if item.get_parent():
+			item.get_parent().remove_child(item)
+		item.queue_free()
+		# 生成通用掉落物（初始在角色中心，由抛出动画散开）
+		var packed := load(item.scene_file_path) as PackedScene
+		if packed:
+			var drop := ITEM_DROP_SCENE.instantiate() as ItemDrop
+			drop.item_scene = packed
+			get_tree().current_scene.add_child(drop)
+			drops.append(drop)
+		inventory[i] = null
+	inventory_changed.emit()
+	_throw_drops(drops)
+
+
+## 掉落物从角色中心向四周抛出：角度均匀分布（带随机抖动），半径贴合角色周围
+func _throw_drops(drops: Array[ItemDrop]) -> void:
+	if drops.is_empty():
+		return
+	var center := global_position
+	var angle_step := TAU / drops.size()
+	for i in drops.size():
+		var angle := angle_step * i + randf_range(-0.25, 0.25)
+		var distance := randf_range(18.0, 28.0)
+		var target := center + Vector2.from_angle(angle) * distance
+		drops[i].throw_from(center, target)
+
+
+func _on_death_animation_finished() -> void:
+	if not is_inside_tree():
+		return
+	# 死亡动画是循环的：播完一轮后停住，角色保持在最后一帧留在场景中
+	animated_sprite.stop()
+	animated_sprite.frame = animated_sprite.sprite_frames.get_frame_count(DIE_ANIM) - 1

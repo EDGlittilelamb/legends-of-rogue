@@ -1,9 +1,11 @@
-[gd_scene load_steps=83 format=3 uid="uid://bqw8ahthqpkjf"]
+[gd_scene load_steps=99 format=3 uid="uid://bqw8ahthqpkjf"]
 
 [ext_resource type="Texture2D" uid="uid://cq0pmbfwc8utg" path="res://assets/Main/Idle/Character_down_idle-Sheet6.png" id="1_nin73"]
 [ext_resource type="Texture2D" uid="uid://d2uj76obvttb3" path="res://assets/Main/Idle/Character_up_idle-Sheet6.png" id="2_3u2hl"]
 [ext_resource type="Texture2D" uid="uid://c331qptj6qwr" path="res://assets/Main/Idle/Character_side-left_idle-Sheet6.png" id="2_ek4k6"]
+[ext_resource type="Texture2D" uid="uid://1ymu6tckk207" path="res://assets/Main/Death/Character_side-left_death1-Sheet6.png" id="2_nr6ai"]
 [ext_resource type="Texture2D" uid="uid://xf01uvlqvnd5" path="res://assets/Main/Idle/Character_side_idle-Sheet6.png" id="3_do33g"]
+[ext_resource type="Texture2D" uid="uid://cnibb72oapfkf" path="res://assets/Main/Death/Character_side_death3-Sheet6.png" id="3_qxgh6"]
 [ext_resource type="Texture2D" uid="uid://d4hd1ekh7xnf8" path="res://assets/Main/Run/Character_down_run-Sheet6.png" id="5_xw2xr"]
 [ext_resource type="Texture2D" uid="uid://bw1r68k73gwky" path="res://assets/Main/Run/Character_side-left_run-Sheet6.png" id="6_lwiaf"]
 [ext_resource type="Texture2D" uid="uid://bs2xtkiqicese" path="res://assets/Main/Run/Character_side_run-Sheet6.png" id="7_l8uxk"]
@@ -12,13 +14,66 @@
 [ext_resource type="Script" uid="uid://b2ymeb1068xfd" path="res://scripts/universalScripts/player.gd" id="10_player"]
 [ext_resource type="Texture2D" uid="uid://ch27vcpvjxkxa" path="res://assets/Main/Punch/Character_down_punch-Sheet4.png" id="10_w71qw"]
 [ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="11_backpack"]
-[ext_resource type="Script" path="res://scripts/universalScripts/attack.gd" id="13_attack"]
 [ext_resource type="Texture2D" uid="uid://cyhn5vi7q8sga" path="res://assets/Main/Punch/Character_side-left_punch-Sheet4.png" id="11_kpb7s"]
 [ext_resource type="Texture2D" uid="uid://hp4df1ndumrc" path="res://assets/Main/Punch/Character_side_punch-Sheet4.png" id="12_hqdoa"]
+[ext_resource type="Script" uid="uid://pi7mi3hl4v0u" path="res://scripts/universalScripts/attack.gd" id="13_attack"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai.gd" id="14_ai"]
 [ext_resource type="Texture2D" uid="uid://cyxrltxqssike" path="res://assets/Main/Punch/Character_up_punch-Sheet4.png" id="13_nr6ai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i524u"]
 size = Vector2(14, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1mbe8"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(0, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rokpa"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(21, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n8ksc"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(42, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6vbvu"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(63, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t1vs1"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(84, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n6iv3"]
+atlas = ExtResource("2_nr6ai")
+region = Rect2(105, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0lpws"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(0, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vqbl3"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(21, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10jkr"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(42, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e7mxi"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(63, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eb2fs"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(84, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_car4u"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(105, 0, 21, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rc5se"]
+atlas = ExtResource("3_qxgh6")
+region = Rect2(126, 0, 21, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mbl0x"]
 atlas = ExtResource("1_nin73")
@@ -280,6 +335,55 @@ region = Rect2(36, 0, 12, 17)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_1mbe8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rokpa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n8ksc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6vbvu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t1vs1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n6iv3")
+}],
+"loop": true,
+"name": &"die_left",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0lpws")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vqbl3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_10jkr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e7mxi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eb2fs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_car4u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rc5se")
+}],
+"loop": true,
+"name": &"die_right",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_mbl0x")
 }, {
 "duration": 1.0,
@@ -531,7 +635,6 @@ animations = [{
 "speed": 12.0
 }]
 
-
 [node name="Legend" type="CharacterBody2D"]
 script = ExtResource("10_player")
 
@@ -540,20 +643,24 @@ shape = SubResource("RectangleShape2D_i524u")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_w8mmf")
-animation = &"idle_right"
-frame_progress = 0.61629826
+animation = &"die_right"
+frame_progress = 0.82829356
 
-[node name="MoveController" type="Node" parent="."]
+[node name="PlayerController" type="Node" parent="."]
+
+[node name="MoveController" type="Node" parent="PlayerController"]
 script = ExtResource("9_hs2ea")
 
-[node name="AttackController" type="Node" parent="."]
+[node name="AttackController" type="Node" parent="PlayerController"]
 script = ExtResource("13_attack")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="PlayerController"]
+
+[node name="BackpackUI" type="Node2D" parent="PlayerController/CanvasLayer"]
+script = ExtResource("11_backpack")
+
+[node name="AIController" type="Node" parent="."]
+script = ExtResource("14_ai")
 
 [node name="weapon" type="Node2D" parent="."]
 position = Vector2(5, 4)
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="BackpackUI" type="Node2D" parent="CanvasLayer"]
-script = ExtResource("11_backpack")
-

@@ -11,13 +11,17 @@ const MOVE_LEFT := "move_left"
 const MOVE_RIGHT := "move_right"
 const MOVE_UP := "move_up"
 
-@onready var legend: CharacterBody2D = get_parent() as CharacterBody2D
+@onready var legend: CharacterBody2D = get_tree().get_first_node_in_group("player") as CharacterBody2D
 @onready var animated_sprite: AnimatedSprite2D = legend.get_node("AnimatedSprite2D") as AnimatedSprite2D
 
 var _last_direction: Vector2 = Vector2.DOWN
 
 
 func _physics_process(_delta: float) -> void:
+	# 死亡后不再移动
+	if legend.get("is_dead"):
+		return
+
 	var input_direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
 	legend.velocity = input_direction * move_speed

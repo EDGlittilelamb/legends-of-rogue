@@ -6,4 +6,4 @@
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="Legend" parent="Camera2D" instance=ExtResource("1_o5qli")]
+[node name="Player" parent="Camera2D" instance=ExtResource("1_o5qli")]
