@@ -19,7 +19,7 @@ const SLOT_COLOR := Color(0.45, 0.45, 0.45, 0.55)
 const SLOT_COLOR_SELECTED := Color(1.0, 0.85, 0.3, 0.95)
 const PANEL_BG := Color(0.0, 0.0, 0.0, 0.3)
 
-var player: Player
+var player: Character
 var is_open := false
 var selected_index := 0
 var _drag_source := -1
@@ -28,8 +28,12 @@ var _drag_item: Item = null
 
 
 func _ready() -> void:
-	# 玩家引用改为 group 查找（节点树结构调整后不再依赖固定父子层级）
-	player = get_tree().get_first_node_in_group("player") as Player
+	# 背包 UI 只属于玩家操控的角色：AI 角色（NPC）不渲染背包
+	var owner_character := _find_character()
+	if owner_character == null or owner_character.ai_controlled:
+		visible = false
+		return
+	player = owner_character as Character
 	# 背包内容变化（拾取/丢弃）时自动刷新物品摆放
 	player.inventory_changed.connect(_refresh_item_placement)
 	# 延迟一帧摆放物品：避免 _ready 阶段 add_child 的物品首帧未进入渲染队列
@@ -38,6 +42,9 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# 无玩家角色时（纯 AI 场景）不处理输入
+	if player == null:
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_B:
 		is_open = not is_open
 		_refresh_item_placement()
@@ -160,6 +167,16 @@ func _slot_rect(row: int, col: int) -> Rect2:
 
 func _slot_center(idx: int) -> Vector2:
 	return _slot_rect(idx / GRID_COLS, idx % GRID_COLS).get_center()
+
+
+## 沿父节点链向上查找自己所属的角色（与 AI 组件一致）
+func _find_character() -> Character:
+	var node := get_parent()
+	while node:
+		if node is Character:
+			return node as Character
+		node = node.get_parent()
+	return null
 
 
 ## 根据视口坐标找到对应格子索引；不在任何可见格子上返回 -1

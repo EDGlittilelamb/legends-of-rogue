@@ -43,9 +43,15 @@ func _on_area_entered(area: Area2D) -> void:
 
 ## 命中结算：只有命中有效目标（有 take_damage 方法）才结算伤害并销毁；
 ## 碰到其他子弹/非目标物体时继续飞行
+## 敌我过滤：攻击者有明确敌人列表（enemies）时只伤害列表中的目标，避免误伤中立/友军；
+## 攻击者没有敌人列表（如玩家）时伤害除自己外的任何目标
 func _resolve_hit(target: Node2D) -> void:
 	if target == attacker:
 		return
+	if attacker is Character:
+		var char_attacker := attacker as Character
+		if not char_attacker.enemies.is_empty() and not char_attacker.is_enemy(target as Character):
+			return
 	if target.has_method("take_damage"):
 		var final_damage := maxi(1, damage - _target_defense(target))
 		target.take_damage(final_damage, attacker)

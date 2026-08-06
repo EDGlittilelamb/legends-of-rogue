@@ -1,4 +1,4 @@
-[gd_scene load_steps=99 format=3 uid="uid://bqw8ahthqpkjf"]
+[gd_scene load_steps=105 format=3 uid="uid://bqw8ahthqpkjf"]
 
 [ext_resource type="Texture2D" uid="uid://cq0pmbfwc8utg" path="res://assets/Main/Idle/Character_down_idle-Sheet6.png" id="1_nin73"]
 [ext_resource type="Texture2D" uid="uid://d2uj76obvttb3" path="res://assets/Main/Idle/Character_up_idle-Sheet6.png" id="2_3u2hl"]
@@ -11,14 +11,19 @@
 [ext_resource type="Texture2D" uid="uid://bs2xtkiqicese" path="res://assets/Main/Run/Character_side_run-Sheet6.png" id="7_l8uxk"]
 [ext_resource type="Texture2D" uid="uid://d2qrk7lecg2ja" path="res://assets/Main/Run/Character_up_run-Sheet6.png" id="8_hy1tl"]
 [ext_resource type="Script" uid="uid://uuudi5jgsndj" path="res://scripts/universalScripts/move.gd" id="9_hs2ea"]
-[ext_resource type="Script" uid="uid://b2ymeb1068xfd" path="res://scripts/universalScripts/player.gd" id="10_player"]
+[ext_resource type="Script" uid="uid://b2ymeb1068xfd" path="res://scripts/universalScripts/character.gd" id="10_player"]
 [ext_resource type="Texture2D" uid="uid://ch27vcpvjxkxa" path="res://assets/Main/Punch/Character_down_punch-Sheet4.png" id="10_w71qw"]
 [ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="11_backpack"]
 [ext_resource type="Texture2D" uid="uid://cyhn5vi7q8sga" path="res://assets/Main/Punch/Character_side-left_punch-Sheet4.png" id="11_kpb7s"]
 [ext_resource type="Texture2D" uid="uid://hp4df1ndumrc" path="res://assets/Main/Punch/Character_side_punch-Sheet4.png" id="12_hqdoa"]
 [ext_resource type="Script" uid="uid://pi7mi3hl4v0u" path="res://scripts/universalScripts/attack.gd" id="13_attack"]
-[ext_resource type="Script" path="res://scripts/universalScripts/ai.gd" id="14_ai"]
 [ext_resource type="Texture2D" uid="uid://cyxrltxqssike" path="res://assets/Main/Punch/Character_up_punch-Sheet4.png" id="13_nr6ai"]
+[ext_resource type="Script" uid="uid://brafxwiddlblj" path="res://scripts/universalScripts/ai.gd" id="14_ai"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai_states/roam_state.gd" id="17_roam"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai_states/chase_state.gd" id="18_chase"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai_states/attack_state.gd" id="19_attack"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai_states/hurt_state.gd" id="20_hurt"]
+[ext_resource type="Script" path="res://scripts/universalScripts/ai_states/dead_state.gd" id="21_dead"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i524u"]
 size = Vector2(14, 16)
@@ -635,8 +640,13 @@ animations = [{
 "speed": 12.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_atk"]
+radius = 100.0
+
 [node name="Legend" type="CharacterBody2D"]
+collision_mask = 2
 script = ExtResource("10_player")
+type = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_i524u")
@@ -661,6 +671,28 @@ script = ExtResource("11_backpack")
 
 [node name="AIController" type="Node" parent="."]
 script = ExtResource("14_ai")
+
+[node name="States" type="Node" parent="AIController"]
+
+[node name="RoamState" type="Node" parent="AIController/States"]
+script = ExtResource("17_roam")
+
+[node name="ChaseState" type="Node" parent="AIController/States"]
+script = ExtResource("18_chase")
+
+[node name="AttackState" type="Node" parent="AIController/States"]
+script = ExtResource("19_attack")
+
+[node name="HurtState" type="Node" parent="AIController/States"]
+script = ExtResource("20_hurt")
+
+[node name="DeadState" type="Node" parent="AIController/States"]
+script = ExtResource("21_dead")
+
+[node name="AttackRange" type="Area2D" parent="AIController"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AIController/AttackRange"]
+shape = SubResource("CircleShape2D_atk")
 
 [node name="weapon" type="Node2D" parent="."]
 position = Vector2(5, 4)

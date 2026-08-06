@@ -1,5 +1,7 @@
 extends Node
 
+@export_group("玩家端")
+
 @export var move_speed: float = 120.0
 
 const IDLE_DOWN := "idle_down"
@@ -11,7 +13,7 @@ const MOVE_LEFT := "move_left"
 const MOVE_RIGHT := "move_right"
 const MOVE_UP := "move_up"
 
-var legend: CharacterBody2D
+var player: CharacterBody2D
 var animated_sprite: AnimatedSprite2D
 
 var _last_direction: Vector2 = Vector2.DOWN
@@ -19,22 +21,26 @@ var _last_direction: Vector2 = Vector2.DOWN
 
 func _ready() -> void:
 	# 在 _ready 中获取玩家引用（@onready 阶段 player group 可能还未就绪）
-	legend = get_tree().get_first_node_in_group("player") as CharacterBody2D
-	animated_sprite = legend.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+	if player:
+		animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
 
 
 func _physics_process(_delta: float) -> void:
+	# 纯 AI 场景中可能没有玩家角色
+	if player == null:
+		return
 	# 死亡后不再移动
-	if legend.get("is_dead"):
+	if player.get("is_dead"):
 		return
 
 	var input_direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
-	legend.velocity = input_direction * move_speed
-	legend.move_and_slide()
+	player.velocity = input_direction * move_speed
+	player.move_and_slide()
 
 	# 空手拳击动画播放期间，不覆盖角色的攻击动画（移动逻辑不受影响）
-	if legend.get("is_punching"):
+	if player.get("is_punching"):
 		return
 
 	if input_direction != Vector2.ZERO:

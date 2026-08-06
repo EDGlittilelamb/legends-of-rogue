@@ -7,3 +7,11 @@
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="Player" parent="Camera2D" instance=ExtResource("1_o5qli")]
+
+[node name="Legend" parent="." instance=ExtResource("1_o5qli")]
+position = Vector2(-137, -59)
+ai_controlled = true
+
+[node name="Legend2" parent="." instance=ExtResource("1_o5qli")]
+position = Vector2(138, -78)
+ai_controlled = true

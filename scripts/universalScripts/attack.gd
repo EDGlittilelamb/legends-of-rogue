@@ -9,14 +9,15 @@ const PUNCH_RIGHT := "punch_right"
 const PUNCH_UP := "punch_up"
 const PUNCH_DOWN := "punch_down"
 
-var player: Player
+var player: Character
 var animated_sprite: AnimatedSprite2D
 
 
 func _ready() -> void:
 	# 在 _ready 中获取玩家引用（@onready 阶段 player group 可能还未就绪）
-	player = get_tree().get_first_node_in_group("player") as Player
-	animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	player = get_tree().get_first_node_in_group("player") as Character
+	if player:
+		animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -28,7 +29,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## 发起攻击：有武器交给武器实现，空手走拳击
 func try_attack() -> void:
-	if player.is_dead:
+	if player == null or player.is_dead:
 		return
 	var aim_direction := (player.get_global_mouse_position() - player.global_position).normalized()
 	if player.current_weapon:

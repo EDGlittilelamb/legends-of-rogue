@@ -1,16 +1,25 @@
 extends CharacterBody2D
-class_name Player
+class_name Character
 
-## 玩家数据中枢：只保存属性/背包/装备状态与对外接口，
-## 行为逻辑由子节点组件负责（MoveController 移动、AttackController 攻击）
+## 角色数据中枢：保存属性/身份/背包/装备状态与对外接口，
+## 行为逻辑由子节点组件负责（玩家：PlayerController；AI：AIController）
 
-## 玩家基础属性
+## ===== 玩家端 =====
+@export_group("玩家端")
+
+## 基础属性
 @export var max_hp: int = 100
 @export var defense: int = 0
 @export var attack: int = 10
 @export var initial_weapon_scene: PackedScene = preload("res://scenes/Weapons/minigun/minigun.tscn")
 ## 控制模式：true = AI 控制（禁用 PlayerController），false = 玩家控制（禁用 AIController）
 @export var ai_controlled := false
+
+## ===== NPC 端 =====
+@export_group("NPC 端")
+
+## 角色类型（CharacterTypes.Type：匪帮/快递员/警察等），在 Inspector 下拉中选择
+@export var type: CharacterTypes.Type = CharacterTypes.Type.NONE
 
 ## 背包初始武器（放入前三个格子）
 const STARTING_WEAPONS: Array[PackedScene] = [
@@ -29,6 +38,16 @@ signal inventory_changed
 var is_punching := false
 ## 角色已死亡（不再响应移动/攻击/受击）
 var is_dead := false
+## 攻击中（AI 攻击会打断移动）
+var is_attacking := false
+## 受击中（受击会打断移动）
+var is_hurt := false
+## 互动中（预留：E 键交互会打断移动）
+var is_interacting := false
+
+## 实例级敌人列表：如店主敌视"进入私密空间的这个玩家"，
+## 但不会对玩家所属的角色类型（type）为敌
+var enemies: Array[Character] = []
 
 ## 死亡动画（测试阶段只播放这一个）
 const DIE_ANIM := "die_left"
@@ -40,8 +59,9 @@ const ITEM_DROP_SCENE := preload("res://scenes/items/item_drop.tscn")
 
 
 func _enter_tree() -> void:
-	# 尽早加入 group：子组件在 ENTER_TREE/@onready 阶段就要能查到玩家
-	add_to_group("player")
+	# 只有玩家操控的角色加入 "player" group（AI 角色不进，避免玩家组件拿错目标）
+	if not ai_controlled:
+		add_to_group("player")
 
 
 func _ready() -> void:
@@ -69,6 +89,8 @@ func _equip_weapon(weapon_scene: PackedScene) -> void:
 		current_weapon.queue_free()
 	current_weapon = weapon_scene.instantiate() as Weapon
 	current_weapon.is_equipped = true
+	# AI 控制时武器不跟随鼠标瞄准（攻击瞬间仍按攻击方向瞄准）
+	current_weapon.aim_follows_mouse = not ai_controlled
 	weapon_holder.add_child(current_weapon)
 	current_weapon.position = Vector2.ZERO
 
@@ -105,14 +127,48 @@ func add_item_to_inventory(item: Item) -> bool:
 	return false
 
 
+## 是否视 target 为敌人（实例级判定，与角色类型无关）
+func is_enemy(target: Character) -> bool:
+	return target in enemies
+
+
+## 把 target 标记为敌人（如店主因玩家闯入私密空间而敌视该玩家实例）
+func add_enemy(target: Character) -> void:
+	if target and not enemies.has(target):
+		enemies.append(target)
+
+
+func remove_enemy(target: Character) -> void:
+	enemies.erase(target)
+
+
 func take_damage(amount: int, attacker: Node2D = null) -> void:
 	if is_dead:
 		return
+	# NPC 端：受到伤害就把攻击者列入敌人（之后会攻击反击）
+	if ai_controlled and attacker is Character:
+		add_enemy(attacker as Character)
 	var final_damage := maxi(1, amount - defense)
 	hp -= final_damage
+	# 受击视觉反馈：短暂闪红
+	modulate = Color(1.0, 0.35, 0.35)
+	get_tree().create_timer(0.12).timeout.connect(_on_hit_flash_finished)
+	# 受击会打断低优先级的 AI 移动
+	is_hurt = true
+	get_tree().create_timer(0.4).timeout.connect(_on_hurt_finished)
 	if hp <= 0:
 		hp = 0
 		_die()
+
+
+func _on_hit_flash_finished() -> void:
+	if is_inside_tree():
+		modulate = Color.WHITE
+
+
+func _on_hurt_finished() -> void:
+	if is_inside_tree():
+		is_hurt = false
 
 
 ## 死亡：掉落背包所有物品，播放死亡动画，播完后停留在最后一帧（尸体留在场景中）

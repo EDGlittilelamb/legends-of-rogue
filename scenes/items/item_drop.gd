@@ -80,9 +80,9 @@ func _on_body_entered(body: Node2D) -> void:
 	# 抛出落定前不可拾取
 	if not _pickup_ready:
 		return
-	if not (body is Player):
+	if not (body is Character):
 		return
-	var player := body as Player
+	var player := body as Character
 	# 死亡角色（尸体）不再拾取
 	if player.is_dead:
 		return

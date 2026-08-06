@@ -19,6 +19,8 @@ var _fire_cooldown := 0.0
 var _attack_token := 0
 ## 是否被玩家装备在手上；背包里的武器实例为 false，不会瞄准/旋转
 var is_equipped := false
+## 是否每帧跟随鼠标瞄准；AI 控制时关闭（攻击瞬间仍按传入方向瞄准）
+var aim_follows_mouse := true
 
 @onready var animated_sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var _holder: Node2D = get_parent() as Node2D
@@ -32,14 +34,15 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_equipped:
-		return
+	# 冷却计时始终递减（AI 模式下 aim_follows_mouse=false 也必须恢复冷却，否则只开一枪）
 	_fire_cooldown = maxf(0.0, _fire_cooldown - delta)
+	if not is_equipped or not aim_follows_mouse:
+		return
 	_aim_at_mouse()
 
 
 ## 攻击入口：统一处理冷却、瞄准与攻击动画，然后交给子类 _fire 实现
-func attack(direction: Vector2, attacker: Player) -> void:
+func attack(direction: Vector2, attacker: Character) -> void:
 	if _fire_cooldown > 0.0:
 		return
 	_fire_cooldown = fire_interval
@@ -49,12 +52,12 @@ func attack(direction: Vector2, attacker: Player) -> void:
 
 
 ## 由具体武器实现攻击逻辑
-func _fire(direction: Vector2, attacker: Player) -> void:
+func _fire(direction: Vector2, attacker: Character) -> void:
 	pass
 
 
 ## 生成一颗子弹（p_grow_rate > 0 时子弹会随飞行距离逐渐变大）
-func _spawn_bullet(fire_dir: Vector2, damage: int, attacker: Player, p_grow_rate: float = 0.0) -> void:
+func _spawn_bullet(fire_dir: Vector2, damage: int, attacker: Character, p_grow_rate: float = 0.0) -> void:
 	if bullet_scene == null:
 		return
 	var bullet := bullet_scene.instantiate() as Area2D
