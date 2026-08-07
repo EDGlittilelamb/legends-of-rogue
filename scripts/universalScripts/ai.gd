@@ -34,7 +34,7 @@ func _ready() -> void:
 			state.setup(npc, self)
 			_assign_state_ref(state)
 	# 同步攻击范围标注（AttackRange 场景节点的圆形形状）
-	var range_area := get_node_or_null("AttackRange") as Area2D
+	var range_area := get_node_or_null("../AttackRange") as Area2D
 	if range_area:
 		var shape := range_area.get_node_or_null("CollisionShape2D") as CollisionShape2D
 		if shape and shape.shape is CircleShape2D:

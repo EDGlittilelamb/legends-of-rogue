@@ -17,6 +17,8 @@ var player: CharacterBody2D
 var animated_sprite: AnimatedSprite2D
 
 var _last_direction: Vector2 = Vector2.DOWN
+## 交互选项 UI 引用（UI 打开时冻结玩家移动）
+var _interaction_ui: InteractionUI
 
 
 func _ready() -> void:
@@ -24,6 +26,12 @@ func _ready() -> void:
 	player = get_tree().get_first_node_in_group("player") as CharacterBody2D
 	if player:
 		animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	# InteractionUI 的 _ready 晚于本节点，延迟一帧获取
+	call_deferred("_setup_ui")
+
+
+func _setup_ui() -> void:
+	_interaction_ui = get_tree().get_first_node_in_group("interaction_ui") as InteractionUI
 
 
 func _physics_process(_delta: float) -> void:
@@ -35,6 +43,9 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var input_direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	# 交互选项 UI 打开时冻结移动（输入置零，动画自然回到 idle）
+	if _interaction_ui and _interaction_ui.visible:
+		input_direction = Vector2.ZERO
 
 	player.velocity = input_direction * move_speed
 	player.move_and_slide()

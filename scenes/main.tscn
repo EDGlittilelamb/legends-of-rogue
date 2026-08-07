@@ -1,17 +1,31 @@
-[gd_scene load_steps=2 format=3 uid="uid://cbvkyw3s2f27n"]
+[gd_scene load_steps=4 format=3 uid="uid://cbvkyw3s2f27n"]
 
 [ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/legend.tscn" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="2_backpack"]
+[ext_resource type="Script" uid="uid://bmshi2y6ln6mf" path="res://scripts/universalScripts/interaction_ui.gd" id="3_interact_ui"]
 
 [node name="Main" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="Player" parent="Camera2D" instance=ExtResource("1_o5qli")]
+[node name="Player" parent="." instance=ExtResource("1_o5qli")]
 
 [node name="Legend" parent="." instance=ExtResource("1_o5qli")]
 position = Vector2(-137, -59)
 ai_controlled = true
+interactions = Array[int]([1])
 
 [node name="Legend2" parent="." instance=ExtResource("1_o5qli")]
 position = Vector2(138, -78)
 ai_controlled = true
+interactions = Array[int]([2, 1])
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="BackpackUI" type="Node2D" parent="CanvasLayer"]
+script = ExtResource("2_backpack")
+
+[node name="InteractionUI" type="Node2D" parent="CanvasLayer"]
+scale = Vector2(0.625, 0.625)
+script = ExtResource("3_interact_ui")
+groups = PackedStringArray("interaction_ui")

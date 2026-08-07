@@ -18,8 +18,10 @@ class_name Character
 ## ===== NPC 端 =====
 @export_group("NPC 端")
 
-## 角色类型（CharacterTypes.Type：匪帮/快递员/警察等），在 Inspector 下拉中选择
-@export var type: CharacterTypes.Type = CharacterTypes.Type.NONE
+## 角色类型（GameConfig.CharacterType：匪帮/快递员/警察等），在 Inspector 下拉中选择
+@export var type: GameConfig.CharacterType = GameConfig.CharacterType.NONE
+## 该角色支持的互动选项（对话/交易等），Inspector 中勾选；玩家按 E 时据此生成选项
+@export var interactions: Array[GameConfig.Interaction] = []
 
 ## 背包初始武器（放入前三个格子）
 const STARTING_WEAPONS: Array[PackedScene] = [

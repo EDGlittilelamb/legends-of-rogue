@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://i0pt10nf0r3x0"]
+
+[ext_resource type="Script" path="res://scenes/ui/interaction_option.gd" id="1_opt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_op1"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.22, 0.22, 0.22, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="InteractionOption" type="PanelContainer"]
+script = ExtResource("1_opt")
+theme_override_styles/panel = SubResource("StyleBoxFlat_op1")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "选项"
