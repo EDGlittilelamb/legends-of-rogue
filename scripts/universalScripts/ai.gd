@@ -68,6 +68,9 @@ func _physics_process(delta: float) -> void:
 	if npc.is_hurt and current != hurt_state:
 		change_state(hurt_state)
 		return
+	# 交互中（玩家正在与该 NPC 对话）：冻结自主行为，保持原地，不漫游不追击
+	if npc.is_interacting:
+		return
 	if current:
 		current.physics_update(delta)
 

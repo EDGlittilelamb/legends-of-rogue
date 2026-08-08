@@ -23,18 +23,15 @@ func _ready() -> void:
 	visible = false
 
 
-func _process(_delta: float) -> void:
-	# 实时跟随玩家（屏幕坐标）：选项框显示在玩家右侧 20px，且始终在 CanvasLayer 顶层
-	if _player:
-		position = _player.get_global_transform_with_canvas().origin + Vector2(10, 0)
-
-
 ## 显示指定目标的互动选项（清空旧选项后按 interactions 重建）
 func show_options(target: Character) -> void:
 	_clear_options()
 	if target == null or target.interactions.is_empty():
 		visible = false
 		return
+	# 打开时定位：玩家屏幕位置右侧 10px（UI 打开期间玩家冻结，位置不会变化）
+	if _player:
+		position = _player.get_global_transform_with_canvas().origin + Vector2(10, 0)
 	for interaction in target.interactions:
 		var option := OPTION_SCENE.instantiate() as InteractionOption
 		# 先加入场景树（触发 @onready 初始化），再设置文本

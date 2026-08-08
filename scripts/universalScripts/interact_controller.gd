@@ -7,6 +7,8 @@ class_name InteractController
 var player: Character
 var interaction_area: Area2D
 var interaction_ui: InteractionUI
+## 当前打开选项 UI 的目标 NPC（关闭 UI 时需解除其交互冻结）
+var _interacting_target: Character = null
 
 
 func _ready() -> void:
@@ -24,7 +26,7 @@ func _setup_ui() -> void:
 func _physics_process(_delta: float) -> void:
 	# UI 打开期间：玩家离开交互范围（找不到可交互目标）时自动关闭
 	if interaction_ui and interaction_ui.visible and _find_nearest_interactable() == null:
-		interaction_ui.hide_options()
+		_close_options()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -38,11 +40,21 @@ func _toggle_options() -> void:
 	if interaction_ui == null:
 		return
 	if interaction_ui.visible:
-		interaction_ui.hide_options()
+		_close_options()
 		return
 	var target := _find_nearest_interactable()
 	if target:
+		_interacting_target = target
+		target.is_interacting = true
 		interaction_ui.show_options(target)
+
+
+## 关闭选项 UI 并解除目标 NPC 的交互冻结（恢复其 AI 自主行为）
+func _close_options() -> void:
+	if _interacting_target:
+		_interacting_target.is_interacting = false
+		_interacting_target = null
+	interaction_ui.hide_options()
 
 
 ## 在交互范围内找最近的可交互角色（有 interactions 且存活）
