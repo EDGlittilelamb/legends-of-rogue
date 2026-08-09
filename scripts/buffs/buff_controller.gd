@@ -65,7 +65,7 @@ func get_stacks(id: StringName) -> int:
 ## 移除全部 buff
 func clear_all_buffs() -> void:
 	while not _buffs.is_empty():
-		var buff := _buffs.pop_back()
+		var buff = _buffs.pop_back()
 		_apply_stat_change(buff, buff.stacks, false)
 		buff_removed.emit(buff)
 

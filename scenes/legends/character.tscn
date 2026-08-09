@@ -1,4 +1,4 @@
-[gd_scene load_steps=107 format=3 uid="uid://bqw8ahthqpkjf"]
+[gd_scene load_steps=108 format=3 uid="uid://bqw8ahthqpkjf"]
 
 [ext_resource type="Texture2D" uid="uid://cq0pmbfwc8utg" path="res://assets/Main/Idle/Character_down_idle-Sheet6.png" id="1_nin73"]
 [ext_resource type="Texture2D" uid="uid://d2uj76obvttb3" path="res://assets/Main/Idle/Character_up_idle-Sheet6.png" id="2_3u2hl"]
@@ -25,6 +25,7 @@
 [ext_resource type="Script" uid="uid://bl3hkh4gd4aj8" path="res://scripts/universalScripts/ai_states/dead_state.gd" id="21_dead"]
 [ext_resource type="Script" uid="uid://b1l7acr1tnka" path="res://scripts/universalScripts/interact_controller.gd" id="22_interact"]
 [ext_resource type="Script" path="res://scripts/buffs/buff_controller.gd" id="24_buff"]
+[ext_resource type="Script" path="res://scripts/skills/skill_controller.gd" id="25_skill"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i524u"]
 size = Vector2(14, 16)
@@ -706,3 +707,6 @@ position = Vector2(5, 4)
 
 [node name="BuffController" type="Node" parent="."]
 script = ExtResource("24_buff")
+
+[node name="SkillController" type="Node" parent="."]
+script = ExtResource("25_skill")

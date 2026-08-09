@@ -1,17 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://cbvkyw3s2f27n"]
+[gd_scene load_steps=5 format=3 uid="uid://cbvkyw3s2f27n"]
 
 [ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/character.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="2_backpack"]
 [ext_resource type="Script" uid="uid://bmshi2y6ln6mf" path="res://scripts/universalScripts/interaction_ui.gd" id="3_interact_ui"]
-[ext_resource type="Script" path="res://scripts/universalScripts/shop_ui.gd" id="4_shop"]
-[ext_resource type="PackedScene" path="res://scenes/skills/dash_skill.tscn" id="5_dash"]
+[ext_resource type="Script" uid="uid://cnlg61jihlmq7" path="res://scripts/universalScripts/shop_ui.gd" id="4_shop"]
 
 [node name="Main" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_o5qli")]
-skill_scene = ExtResource("5_dash")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
 
 [node name="Legend" parent="." instance=ExtResource("1_o5qli")]
 position = Vector2(-137, -59)
@@ -34,4 +34,3 @@ script = ExtResource("3_interact_ui")
 
 [node name="ShopUI" type="Node2D" parent="CanvasLayer"]
 script = ExtResource("4_shop")
-groups = PackedStringArray("shop_ui")

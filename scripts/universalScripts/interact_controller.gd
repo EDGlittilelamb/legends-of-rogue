@@ -10,6 +10,8 @@ var interaction_ui: InteractionUI
 var shop_ui: ShopUI
 ## 当前打开选项 UI 的目标 NPC（关闭 UI 时需解除其交互冻结）
 var _interacting_target: Character = null
+## 当前交易中的店主（商店关闭时需解除其交互冻结）
+var _shop_target: Character = null
 
 
 func _ready() -> void:
@@ -37,7 +39,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
 		# 商店打开时按 E 先关闭商店（不再触发交互选项）
 		if shop_ui and shop_ui.is_open:
-			shop_ui.close_shop()
+			_close_shop()
 			get_viewport().set_input_as_handled()
 			return
 		_toggle_options()
@@ -72,11 +74,21 @@ func _on_option_chosen(interaction: GameConfig.Interaction) -> void:
 	_close_options()
 	match interaction:
 		GameConfig.Interaction.TRADE:
-			# 商店：读取店主背包展示货物与价格（仅展示）
+			# 商店：交易期间双方冻结（店主 is_interacting，玩家由 move.gd 按商店状态冻结）
 			if shop_ui and target:
+				_shop_target = target
+				target.is_interacting = true
 				shop_ui.open_shop(target)
 		_:
 			pass  # TALK/INSPECT 等后续实现
+
+
+## 关闭商店并解除店主的交互冻结（恢复其 AI 自主行为）
+func _close_shop() -> void:
+	if _shop_target:
+		_shop_target.is_interacting = false
+		_shop_target = null
+	shop_ui.close_shop()
 
 
 ## 在交互范围内找最近的可交互角色（有 interactions 且存活）

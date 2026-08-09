@@ -35,6 +35,10 @@ func open_shop(keeper: Character) -> void:
 	shopkeeper = keeper
 	is_open = true
 	visible = true
+	# 定位：店主头顶上方居中（店主被交互冻结，位置不会变化）
+	var keeper_screen := keeper.get_global_transform_with_canvas().origin
+	var grid_width := MAX_SLOTS * SLOT_SIZE + (MAX_SLOTS - 1) * SLOT_GAP
+	position = keeper_screen + Vector2(-grid_width / 2.0, -SLOT_SIZE - 12.0)
 	_refresh_items()
 	queue_redraw()
 
@@ -51,23 +55,18 @@ func close_shop() -> void:
 func _draw() -> void:
 	if not is_open or shopkeeper == null:
 		return
-	var viewport_size := get_viewport().get_visible_rect().size
 	var grid_size := Vector2(
 		MAX_SLOTS * SLOT_SIZE + (MAX_SLOTS - 1) * SLOT_GAP,
 		SLOT_SIZE
 	)
-	# 右下角面板
-	var origin := Vector2(
-		viewport_size.x - MARGIN - grid_size.x,
-		viewport_size.y - MARGIN - grid_size.y
-	)
-	draw_rect(Rect2(origin, grid_size), PANEL_BG)
+	# 面板：以本节点为左上角（节点已定位在店主头顶上方）
+	draw_rect(Rect2(Vector2.ZERO, grid_size), PANEL_BG)
 	# 格子 + 价格角标
 	var font := ThemeDB.fallback_font
 	for i in MAX_SLOTS:
-		var rect := _slot_rect(i, origin)
+		var rect := _slot_rect(i, Vector2.ZERO)
 		draw_rect(rect, SLOT_COLOR)
-		var item := shopkeeper.inventory[i] if i < shopkeeper.inventory.size() else null
+		var item: Item = shopkeeper.inventory[i] if i < shopkeeper.inventory.size() else null
 		if item == null or item.cost <= 0:
 			continue
 		var text := "%d$" % item.cost
@@ -83,7 +82,8 @@ func _refresh_items() -> void:
 			remove_child(child)
 	if shopkeeper == null:
 		return
-	var origin := _grid_origin()
+	# 面板以本节点为原点（节点已定位在店主头顶）
+	var origin := Vector2.ZERO
 	for i in mini(shopkeeper.inventory.size(), MAX_SLOTS):
 		var item := shopkeeper.inventory[i]
 		if item == null:
@@ -106,15 +106,6 @@ func _fit_item(item: Node2D) -> void:
 	if longest <= 0.0:
 		return
 	item.scale = Vector2.ONE * minf(ITEM_FIT_SIZE / longest, 1.0)
-
-
-func _grid_origin() -> Vector2:
-	var viewport_size := get_viewport().get_visible_rect().size
-	var grid_size := Vector2(
-		MAX_SLOTS * SLOT_SIZE + (MAX_SLOTS - 1) * SLOT_GAP,
-		SLOT_SIZE
-	)
-	return Vector2(viewport_size.x - MARGIN - grid_size.x, viewport_size.y - MARGIN - grid_size.y)
 
 
 func _slot_rect(idx: int, origin: Vector2) -> Rect2:

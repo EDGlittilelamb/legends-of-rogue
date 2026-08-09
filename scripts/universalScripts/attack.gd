@@ -11,6 +11,10 @@ const PUNCH_DOWN := "punch_down"
 
 var player: Character
 var animated_sprite: AnimatedSprite2D
+## 交互选项 UI 引用（打开时禁止攻击，点击用于操作 UI）
+var _interaction_ui: InteractionUI
+## 商店 UI 引用（打开时禁止攻击）
+var _shop_ui: ShopUI
 
 
 func _ready() -> void:
@@ -18,6 +22,13 @@ func _ready() -> void:
 	player = get_tree().get_first_node_in_group("player") as Character
 	if player:
 		animated_sprite = player.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	# UI 的 _ready 晚于本节点，延迟一帧获取
+	call_deferred("_setup_ui")
+
+
+func _setup_ui() -> void:
+	_interaction_ui = get_tree().get_first_node_in_group("interaction_ui") as InteractionUI
+	_shop_ui = get_tree().get_first_node_in_group("shop_ui") as ShopUI
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -30,6 +41,9 @@ func _unhandled_input(event: InputEvent) -> void:
 ## 发起攻击：有武器交给武器实现，空手走拳击
 func try_attack() -> void:
 	if player == null or player.is_dead:
+		return
+	# 交互选项/商店 UI 打开时不攻击（此时点击用于操作 UI）
+	if (_interaction_ui and _interaction_ui.visible) or (_shop_ui and _shop_ui.is_open):
 		return
 	var aim_direction := (player.get_global_mouse_position() - player.global_position).normalized()
 	if player.current_weapon:

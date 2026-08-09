@@ -13,6 +13,8 @@ class_name Character
 @export var attack: int = 10
 @export var money: int = 100
 @export var initial_weapon_scene: PackedScene = preload("res://scenes/Weapons/minigun/minigun.tscn")
+## 角色技能场景（差异化入口）：在 Inspector 给不同角色配不同技能；不配置则无技能（右键无效）
+@export var skill_scene: PackedScene
 ## 控制模式：true = AI 控制（禁用 PlayerController），false = 玩家控制（禁用 AIController）
 @export var ai_controlled := false
 
