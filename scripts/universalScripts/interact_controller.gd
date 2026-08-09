@@ -7,6 +7,7 @@ class_name InteractController
 var player: Character
 var interaction_area: Area2D
 var interaction_ui: InteractionUI
+var shop_ui: ShopUI
 ## 当前打开选项 UI 的目标 NPC（关闭 UI 时需解除其交互冻结）
 var _interacting_target: Character = null
 
@@ -21,6 +22,9 @@ func _ready() -> void:
 
 func _setup_ui() -> void:
 	interaction_ui = get_tree().get_first_node_in_group("interaction_ui") as InteractionUI
+	if interaction_ui:
+		interaction_ui.option_chosen.connect(_on_option_chosen)
+	shop_ui = get_tree().get_first_node_in_group("shop_ui") as ShopUI
 
 
 func _physics_process(_delta: float) -> void:
@@ -31,6 +35,11 @@ func _physics_process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
+		# 商店打开时按 E 先关闭商店（不再触发交互选项）
+		if shop_ui and shop_ui.is_open:
+			shop_ui.close_shop()
+			get_viewport().set_input_as_handled()
+			return
 		_toggle_options()
 		get_viewport().set_input_as_handled()
 
@@ -55,6 +64,19 @@ func _close_options() -> void:
 		_interacting_target.is_interacting = false
 		_interacting_target = null
 	interaction_ui.hide_options()
+
+
+## 玩家点击了某个互动选项：先关选项，再按类型执行对应行为
+func _on_option_chosen(interaction: GameConfig.Interaction) -> void:
+	var target := _interacting_target
+	_close_options()
+	match interaction:
+		GameConfig.Interaction.TRADE:
+			# 商店：读取店主背包展示货物与价格（仅展示）
+			if shop_ui and target:
+				shop_ui.open_shop(target)
+		_:
+			pass  # TALK/INSPECT 等后续实现
 
 
 ## 在交互范围内找最近的可交互角色（有 interactions 且存活）

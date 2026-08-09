@@ -6,6 +6,9 @@ class_name InteractionUI
 
 const OPTION_SCENE := preload("res://scenes/ui/interaction_option.tscn")
 
+## 玩家选择了某个互动选项（TALK/TRADE 等），InteractController 监听后执行对应行为
+signal option_chosen(interaction: GameConfig.Interaction)
+
 var option_container: VBoxContainer
 ## 跟随的玩家角色（在 _ready 中缓存）
 var _player: Character
@@ -34,10 +37,16 @@ func show_options(target: Character) -> void:
 		position = _player.get_global_transform_with_canvas().origin + Vector2(10, 0)
 	for interaction in target.interactions:
 		var option := OPTION_SCENE.instantiate() as InteractionOption
-		# 先加入场景树（触发 @onready 初始化），再设置文本
+		# 先加入场景树（触发 @onready 初始化），再设置文本与互动类型
 		option_container.add_child(option)
 		option.set_option_text(GameConfig.get_interaction_label(interaction))
+		option.interaction_type = interaction
+		option.option_selected.connect(_on_option_selected)
 	visible = true
+
+
+func _on_option_selected(interaction: GameConfig.Interaction) -> void:
+	option_chosen.emit(interaction)
 
 
 ## 隐藏并清空选项

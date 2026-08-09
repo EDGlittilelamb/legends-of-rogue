@@ -30,7 +30,7 @@ project/assembly_name="legends-of-rogue"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 

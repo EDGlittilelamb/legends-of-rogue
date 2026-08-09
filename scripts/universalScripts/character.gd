@@ -11,6 +11,7 @@ class_name Character
 @export var max_hp: int = 100
 @export var defense: int = 0
 @export var attack: int = 10
+@export var money: int = 100
 @export var initial_weapon_scene: PackedScene = preload("res://scenes/Weapons/minigun/minigun.tscn")
 ## 控制模式：true = AI 控制（禁用 PlayerController），false = 玩家控制（禁用 AIController）
 @export var ai_controlled := false
@@ -29,6 +30,8 @@ const STARTING_WEAPONS: Array[PackedScene] = [
 	preload("res://scenes/Weapons/minigun/minigun.tscn"),
 	preload("res://scenes/Weapons/pistol/pistol.tscn"),
 ]
+## NPC（AI 控制）背包格数上限：店主等 NPC 最多持有这么多物品
+const NPC_INVENTORY_SIZE := 5
 
 var hp: int
 var current_weapon: Weapon
@@ -68,7 +71,8 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	hp = max_hp
-	inventory.resize(20)
+	# NPC 背包上限 5 格，玩家 20 格
+	inventory.resize(NPC_INVENTORY_SIZE if ai_controlled else 20)
 	for i in STARTING_WEAPONS.size():
 		inventory[i] = STARTING_WEAPONS[i].instantiate() as Item
 	# 初始装备背包第 1 格武器（与默认选中一致）
@@ -142,6 +146,13 @@ func add_enemy(target: Character) -> void:
 
 func remove_enemy(target: Character) -> void:
 	enemies.erase(target)
+
+
+## 施加 buff（便捷方法：转发给根下的 BuffController）
+func apply_buff(data: BuffData, stacks := 1, source: Node = null) -> void:
+	var controller := get_node_or_null("BuffController") as BuffController
+	if controller:
+		controller.apply_buff(data, stacks, source)
 
 
 func take_damage(amount: int, attacker: Node2D = null) -> void:

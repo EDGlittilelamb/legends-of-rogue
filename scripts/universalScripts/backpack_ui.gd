@@ -51,6 +51,12 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 
+	# Q：使用当前选中格子的消耗品（武器等非消耗品跳过）
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_Q:
+		_use_selected_consumable()
+		get_viewport().set_input_as_handled()
+		return
+
 	if event is InputEventMouseButton:
 		if event.pressed:
 			# 未打开时：滚轮在默认行 5 格之间切换选中，并同步装备选中的武器
@@ -115,6 +121,24 @@ func _draw() -> void:
 ## 装备当前选中格子里的武器（换到玩家手上）
 func _equip_selected() -> void:
 	player.equip_from_inventory(selected_index)
+
+
+## 使用当前选中格子的物品：仅消耗品生效（调用 use 并从背包移除）
+func _use_selected_consumable() -> void:
+	if player == null or selected_index >= player.inventory.size():
+		return
+	var item := player.inventory[selected_index]
+	if item == null or not item.consumable:
+		return
+	item.use(player)
+	# 消耗：从背包移除并销毁实例
+	player.inventory[selected_index] = null
+	if item.get_parent() == self:
+		remove_child(item)
+	item.queue_free()
+	player.inventory_changed.emit()
+	_refresh_item_placement()
+	queue_redraw()
 
 
 ## 交换背包中两个格子的物品并刷新显示

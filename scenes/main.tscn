@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cbvkyw3s2f27n"]
+[gd_scene load_steps=5 format=3 uid="uid://cbvkyw3s2f27n"]
 
-[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/legend.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/character.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="2_backpack"]
 [ext_resource type="Script" uid="uid://bmshi2y6ln6mf" path="res://scripts/universalScripts/interaction_ui.gd" id="3_interact_ui"]
+[ext_resource type="Script" path="res://scripts/universalScripts/shop_ui.gd" id="4_shop"]
 
 [node name="Main" type="Node2D"]
 
@@ -30,4 +31,7 @@ script = ExtResource("2_backpack")
 [node name="InteractionUI" type="Node2D" parent="CanvasLayer"]
 scale = Vector2(0.625, 0.625)
 script = ExtResource("3_interact_ui")
-groups = PackedStringArray("interaction_ui")
+
+[node name="ShopUI" type="Node2D" parent="CanvasLayer"]
+script = ExtResource("4_shop")
+groups = PackedStringArray("shop_ui")
