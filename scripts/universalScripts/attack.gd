@@ -6,8 +6,6 @@ class_name AttackController
 
 const PUNCH_LEFT := "punch_left"
 const PUNCH_RIGHT := "punch_right"
-const PUNCH_UP := "punch_up"
-const PUNCH_DOWN := "punch_down"
 
 var player: Character
 var animated_sprite: AnimatedSprite2D
@@ -89,6 +87,6 @@ func _on_punch_animation_finished() -> void:
 
 
 func _punch_animation_for(direction: Vector2) -> String:
-	if absf(direction.x) > absf(direction.y):
-		return PUNCH_RIGHT if direction.x > 0.0 else PUNCH_LEFT
-	return PUNCH_DOWN if direction.y > 0.0 else PUNCH_UP
+	# 只有左右拳击动画：垂直瞄准时沿用角色当前朝向
+	var facing_right := direction.x > 0.0 if direction.x != 0.0 else player.facing_right
+	return PUNCH_RIGHT if facing_right else PUNCH_LEFT

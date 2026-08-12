@@ -4,14 +4,10 @@ extends Node
 ## NPC 状态基类：作为状态机（AIController）的子节点，由状态机注入 npc/machine
 ## 子类实现 enter / exit / physics_update
 
-const IDLE_DOWN := "idle_down"
 const IDLE_LEFT := "idle_left"
 const IDLE_RIGHT := "idle_right"
-const IDLE_UP := "idle_up"
-const MOVE_DOWN := "move_down"
 const MOVE_LEFT := "move_left"
 const MOVE_RIGHT := "move_right"
-const MOVE_UP := "move_up"
 
 var npc: Character
 var machine: AIController
@@ -56,16 +52,14 @@ func find_nearest_enemy() -> Character:
 func play_move_animation(direction: Vector2) -> void:
 	if animated_sprite == null:
 		return
-	if absf(direction.x) > absf(direction.y):
-		animated_sprite.play(MOVE_RIGHT if direction.x > 0.0 else MOVE_LEFT)
-	else:
-		animated_sprite.play(MOVE_DOWN if direction.y > 0.0 else MOVE_UP)
+	# 只有左右动画：水平移动更新朝向，垂直移动沿用当前朝向
+	if direction.x != 0.0:
+		npc.facing_right = direction.x > 0.0
+	animated_sprite.play(MOVE_RIGHT if npc.facing_right else MOVE_LEFT)
 
 
 func play_idle_animation(direction: Vector2) -> void:
 	if animated_sprite == null:
 		return
-	if absf(direction.x) > absf(direction.y):
-		animated_sprite.play(IDLE_RIGHT if direction.x > 0.0 else IDLE_LEFT)
-	else:
-		animated_sprite.play(IDLE_DOWN if direction.y > 0.0 else IDLE_UP)
+	var facing_right := direction.x > 0.0 if direction.x != 0.0 else npc.facing_right
+	animated_sprite.play(IDLE_RIGHT if facing_right else IDLE_LEFT)

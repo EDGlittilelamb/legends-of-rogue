@@ -69,6 +69,7 @@ animations = [{
 }]
 
 [node name="Pistol" type="Area2D"]
+cost = 80
 script = ExtResource("2_pl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

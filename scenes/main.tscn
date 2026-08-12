@@ -1,25 +1,23 @@
-[gd_scene load_steps=6 format=3 uid="uid://cbvkyw3s2f27n"]
+[gd_scene load_steps=7 format=3 uid="uid://cbvkyw3s2f27n"]
 
-[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/legends/character.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/characters/character.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://cw0goi1n8bofp" path="res://scripts/universalScripts/backpack_ui.gd" id="2_backpack"]
 [ext_resource type="Script" uid="uid://bmshi2y6ln6mf" path="res://scripts/universalScripts/interaction_ui.gd" id="3_interact_ui"]
-[ext_resource type="Script" path="res://scripts/universalScripts/shop_ui.gd" id="4_shop"]
-[ext_resource type="PackedScene" path="res://scenes/skills/dash_skill.tscn" id="5_dash"]
+[ext_resource type="Script" uid="uid://cnlg61jihlmq7" path="res://scripts/universalScripts/shop_ui.gd" id="4_shop"]
+[ext_resource type="Script" uid="uid://ba2kqoxk8uaci" path="res://scripts/universalScripts/hud.gd" id="6_hud"]
+[ext_resource type="PackedScene" uid="uid://diwrycnherohq" path="res://scenes/characters/instigator.tscn" id="6_tefeu"]
 
 [node name="Main" type="Node2D"]
 
-[node name="Player" parent="." instance=ExtResource("1_o5qli")]
-skill_scene = ExtResource("5_dash")
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-
 [node name="Legend" parent="." instance=ExtResource("1_o5qli")]
 position = Vector2(-137, -59)
+money = 80
 ai_controlled = true
 interactions = Array[int]([1])
 
 [node name="Legend2" parent="." instance=ExtResource("1_o5qli")]
 position = Vector2(138, -78)
+money = 500
 ai_controlled = true
 interactions = Array[int]([2, 1])
 
@@ -34,4 +32,10 @@ script = ExtResource("3_interact_ui")
 
 [node name="ShopUI" type="Node2D" parent="CanvasLayer"]
 script = ExtResource("4_shop")
-groups = PackedStringArray("shop_ui")
+
+[node name="HUD" type="Node2D" parent="CanvasLayer"]
+script = ExtResource("6_hud")
+
+[node name="Instigator" parent="." instance=ExtResource("6_tefeu")]
+
+[node name="Camera2D" type="Camera2D" parent="Instigator"]

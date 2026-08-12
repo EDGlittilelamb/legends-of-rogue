@@ -7,6 +7,8 @@ extends Node
 
 @export var skill_name: String = "Skill"
 @export var cooldown: float = 3.0
+## 交互型技能：不为 NONE 时，玩家与目标互动会附加该选项（此时右键不施放）
+@export var interaction_option: GameConfig.Interaction = GameConfig.Interaction.NONE
 
 ## 技能持有者（SkillController 注入）
 var character: Character
@@ -41,6 +43,12 @@ func cooldown_ratio() -> float:
 	if cooldown <= 0.0:
 		return 0.0
 	return clampf(_cd_remaining / cooldown, 0.0, 1.0)
+
+
+## 交互型技能触发：玩家点击对应互动选项时由 SkillController 调用；
+## 返回 true 表示已处理（子类覆写）
+func perform_interaction(_target: Character) -> bool:
+	return false
 
 
 func _process(delta: float) -> void:

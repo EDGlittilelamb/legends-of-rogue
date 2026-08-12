@@ -57,7 +57,7 @@ func _toggle_options() -> void:
 	if target:
 		_interacting_target = target
 		target.is_interacting = true
-		interaction_ui.show_options(target)
+		interaction_ui.show_options(target, _extra_interactions())
 
 
 ## 关闭选项 UI 并解除目标 NPC 的交互冻结（恢复其 AI 自主行为）
@@ -79,8 +79,23 @@ func _on_option_chosen(interaction: GameConfig.Interaction) -> void:
 				_shop_target = target
 				target.is_interacting = true
 				shop_ui.open_shop(target)
+		GameConfig.Interaction.INSULT:
+			# 侮辱：转发给玩家的交互型技能（troll 的 InsultSkill）
+			var skill_controller := player.get_node_or_null("SkillController") as SkillController
+			if skill_controller:
+				skill_controller.try_interaction(interaction, target)
 		_:
 			pass  # TALK/INSPECT 等后续实现
+
+
+## 玩家交互型技能附加的额外选项（如 troll 的侮辱）
+func _extra_interactions() -> Array[GameConfig.Interaction]:
+	if player == null:
+		return []
+	var skill_controller := player.get_node_or_null("SkillController") as SkillController
+	if skill_controller:
+		return skill_controller.get_interaction_options()
+	return []
 
 
 ## 关闭商店并解除店主的交互冻结（恢复其 AI 自主行为）

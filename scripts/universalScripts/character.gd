@@ -15,6 +15,8 @@ class_name Character
 @export var initial_weapon_scene: PackedScene = preload("res://scenes/Weapons/minigun/minigun.tscn")
 ## 角色技能场景（差异化入口）：在 Inspector 给不同角色配不同技能；不配置则无技能（右键无效）
 @export var skill_scene: PackedScene
+## 善良值（0-100）：troll 的侮辱技能判定依据；越低侮辱越致命
+@export var kindness_score: int = 100
 ## 控制模式：true = AI 控制（禁用 PlayerController），false = 玩家控制（禁用 AIController）
 @export var ai_controlled := false
 
@@ -43,6 +45,8 @@ var inventory: Array[Item] = []
 signal inventory_changed
 ## 空手拳击动画播放中（move.gd 在此期间不覆盖动画）
 var is_punching := false
+## 当前朝向（只有左右动画）：move.gd / AI 状态机维护，attack.gd 读取
+var facing_right := true
 ## 角色已死亡（不再响应移动/攻击/受击）
 var is_dead := false
 ## 攻击中（AI 攻击会打断移动）
@@ -55,18 +59,25 @@ var is_interacting := false
 ## 实例级敌人列表：如店主敌视"进入私密空间的这个玩家"，
 ## 但不会对玩家所属的角色类型（type）为敌
 var enemies: Array[Character] = []
+## 厌恶本角色的角色列表（记恨者）：由侮辱等行为填充，具体逻辑后续实现
+var haters: Array[Character] = []
 
 ## 死亡动画（测试阶段只播放这一个）
 const DIE_ANIM := "die_left"
 ## 掉落物场景（死亡时掉落背包物品用）
 const ITEM_DROP_SCENE := preload("res://scenes/items/item_drop.tscn")
+## 金币掉落场景与每堆金币的价值
+const MONEY_DROP_SCENE := preload("res://scenes/crafts/money.tscn")
+const MONEY_PER_DROP := 50
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var weapon_holder: Node2D = $weapon
 
 
 func _enter_tree() -> void:
-	# 只有玩家操控的角色加入 "player" group（AI 角色不进，避免玩家组件拿错目标）
+	# 所有角色进 characters group（供全局查找附近角色等）；
+	# 只有玩家操控的角色额外进 player group（避免玩家组件拿错目标）
+	add_to_group("characters")
 	if not ai_controlled:
 		add_to_group("player")
 
@@ -123,6 +134,12 @@ func _unequip_weapon() -> void:
 	if current_weapon:
 		current_weapon.queue_free()
 		current_weapon = null
+
+
+## 修改善良值（统一入口：更新数值并通知 GameRules 广播；范围 0-100）
+func change_kindness(delta: int) -> void:
+	kindness_score = clampi(kindness_score + delta, 0, 100)
+	GameRules.notify_kindness_changed(self)
 
 
 ## 尝试把物品放入背包第一个空格；成功返回 true，背包满返回 false
@@ -196,6 +213,7 @@ func _die() -> void:
 		current_weapon.is_equipped = false
 		current_weapon.visible = false
 	_drop_all_inventory()
+	_drop_money()
 	animated_sprite.play(DIE_ANIM)
 	var frames := animated_sprite.sprite_frames.get_frame_count(DIE_ANIM)
 	var speed := animated_sprite.sprite_frames.get_animation_speed(DIE_ANIM)
@@ -223,6 +241,23 @@ func _drop_all_inventory() -> void:
 			drops.append(drop)
 		inventory[i] = null
 	inventory_changed.emit()
+	_throw_drops(drops)
+
+
+## 死亡时掉落全部金币：拆成多堆散落在角色周围（拾取直接加金币，不进背包/商店）
+func _drop_money() -> void:
+	if money <= 0:
+		return
+	var total := money
+	money = 0
+	var drops: Array[ItemDrop] = []
+	while total > 0:
+		var drop := MONEY_DROP_SCENE.instantiate() as ItemDrop
+		if drop is MoneyDrop:
+			(drop as MoneyDrop).amount = mini(total, MONEY_PER_DROP)
+		get_tree().current_scene.add_child(drop)
+		drops.append(drop)
+		total -= MONEY_PER_DROP
 	_throw_drops(drops)
 
 

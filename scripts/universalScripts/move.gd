@@ -4,19 +4,14 @@ extends Node
 
 @export var move_speed: float = 120.0
 
-const IDLE_DOWN := "idle_down"
 const IDLE_LEFT := "idle_left"
 const IDLE_RIGHT := "idle_right"
-const IDLE_UP := "idle_up"
-const MOVE_DOWN := "move_down"
 const MOVE_LEFT := "move_left"
 const MOVE_RIGHT := "move_right"
-const MOVE_UP := "move_up"
 
 var player: CharacterBody2D
 var animated_sprite: AnimatedSprite2D
 
-var _last_direction: Vector2 = Vector2.DOWN
 ## 交互选项 UI 引用（UI 打开时冻结玩家移动）
 var _interaction_ui: InteractionUI
 ## 商店 UI 引用（商店打开时同样冻结玩家移动）
@@ -58,33 +53,17 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	if input_direction != Vector2.ZERO:
-		_last_direction = input_direction.normalized()
-		_play_move_animation(_last_direction)
+		# 只有左右动画：水平输入更新朝向，垂直移动沿用当前朝向
+		if input_direction.x != 0.0:
+			player.facing_right = input_direction.x > 0.0
+		_play_move_animation(player.facing_right)
 	else:
-		_play_idle_animation(_last_direction)
+		_play_idle_animation(player.facing_right)
 
 
-func _play_move_animation(direction: Vector2) -> void:
-	if absf(direction.x) > absf(direction.y):
-		if direction.x > 0.0:
-			animated_sprite.play(MOVE_RIGHT)
-		else:
-			animated_sprite.play(MOVE_LEFT)
-	else:
-		if direction.y > 0.0:
-			animated_sprite.play(MOVE_DOWN)
-		else:
-			animated_sprite.play(MOVE_UP)
+func _play_move_animation(facing_right: bool) -> void:
+	animated_sprite.play(MOVE_RIGHT if facing_right else MOVE_LEFT)
 
 
-func _play_idle_animation(direction: Vector2) -> void:
-	if absf(direction.x) > absf(direction.y):
-		if direction.x > 0.0:
-			animated_sprite.play(IDLE_RIGHT)
-		else:
-			animated_sprite.play(IDLE_LEFT)
-	else:
-		if direction.y > 0.0:
-			animated_sprite.play(IDLE_DOWN)
-		else:
-			animated_sprite.play(IDLE_UP)
+func _play_idle_animation(facing_right: bool) -> void:
+	animated_sprite.play(IDLE_RIGHT if facing_right else IDLE_LEFT)

@@ -20,6 +20,7 @@ enum Interaction {
 	TRADE,        ## 交易
 	ATTACK,       ## 攻击/敌对
 	INSPECT,      ## 查看
+	INSULT,       ## 侮辱（troll 角色的交互型技能选项）
 }
 
 ## 互动选项在 UI 上显示的名称
@@ -33,5 +34,7 @@ static func get_interaction_label(type: Interaction) -> String:
 			return "攻击"
 		Interaction.INSPECT:
 			return "查看"
+		Interaction.INSULT:
+			return "侮辱"
 		_:
 			return "未知"

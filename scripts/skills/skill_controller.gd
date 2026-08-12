@@ -32,6 +32,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	# 仅玩家操控的角色响应鼠标右键（AI 角色的技能由 AI 状态机触发）
 	if character == null or character.ai_controlled:
 		return
+	# 交互型技能（如侮辱）不走右键，改由交互选项触发
+	if skill and skill.interaction_option != GameConfig.Interaction.NONE:
+		return
 	if event is InputEventMouseButton \
 			and event.pressed \
 			and event.button_index == MOUSE_BUTTON_RIGHT:
@@ -46,6 +49,21 @@ func try_cast(aim_direction: Vector2 = Vector2.ZERO) -> bool:
 	if aim_direction == Vector2.ZERO:
 		aim_direction = (character.get_global_mouse_position() - character.global_position).normalized()
 	return skill.try_cast(aim_direction)
+
+
+## 交互型技能提供的额外互动选项（如侮辱）；无则返回空数组
+func get_interaction_options() -> Array[GameConfig.Interaction]:
+	var options: Array[GameConfig.Interaction] = []
+	if skill and skill.interaction_option != GameConfig.Interaction.NONE:
+		options.append(skill.interaction_option)
+	return options
+
+
+## 玩家点击交互选项时转发给技能（仅当选项属于本技能）；返回 true 表示已处理
+func try_interaction(interaction: GameConfig.Interaction, target: Character) -> bool:
+	if skill == null or skill.interaction_option != interaction:
+		return false
+	return skill.perform_interaction(target)
 
 
 func _find_character() -> Character:

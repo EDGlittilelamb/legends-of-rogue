@@ -20,11 +20,14 @@ const PRICE_FONT_SIZE := 10
 ## 当前展示的店主（null 表示商店关闭）
 var shopkeeper: Character
 var is_open := false
+## 购买者（玩家角色，_ready 时从 group 查找）
+var player: Character
 
 
 func _ready() -> void:
 	# 注册 group 供 InteractController 查找（场景属性 + 代码双保险）
 	add_to_group("shop_ui")
+	player = get_tree().get_first_node_in_group("player") as Character
 	visible = false
 
 
@@ -50,6 +53,47 @@ func close_shop() -> void:
 	_refresh_items()
 	shopkeeper = null
 	queue_redraw()
+
+
+func _input(event: InputEvent) -> void:
+	# 商店打开时：左键点击格子购买物品
+	if not is_open or shopkeeper == null or player == null:
+		return
+	if event is InputEventMouseButton \
+			and event.pressed \
+			and event.button_index == MOUSE_BUTTON_LEFT:
+		var slot := _slot_at(event.position)
+		if slot >= 0:
+			_try_buy(slot)
+			get_viewport().set_input_as_handled()
+
+
+## 购买指定格子的物品：钱够且背包有空位才成交
+func _try_buy(idx: int) -> void:
+	if idx >= shopkeeper.inventory.size():
+		return
+	var item := shopkeeper.inventory[idx]
+	if item == null or item.cost <= 0:
+		return
+	# 钱不够 / 背包已满：不成交
+	if player.money < item.cost:
+		return
+	if not player.add_item_to_inventory(item):
+		return
+	# 成交：扣钱、店主背包移除该物品、刷新显示
+	player.money -= item.cost
+	shopkeeper.inventory[idx] = null
+	_refresh_items()
+	queue_redraw()
+
+
+## 根据视口坐标找到对应格子索引；不在任何格子上返回 -1
+func _slot_at(pos: Vector2) -> int:
+	var origin := Vector2.ZERO
+	for i in MAX_SLOTS:
+		if _slot_rect(i, origin).has_point(pos):
+			return i
+	return -1
 
 
 func _draw() -> void:

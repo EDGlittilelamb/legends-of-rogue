@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8kmmua8ahhml"]
+
+[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/characters/character.tscn" id="1_xk14y"]
+[ext_resource type="PackedScene" path="res://scenes/skills/insult_skill.tscn" id="2_15lc2"]
+
+[node name="Troll" instance=ExtResource("1_xk14y")]
+skill_scene = ExtResource("2_15lc2")

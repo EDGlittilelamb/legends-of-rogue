@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://diwrycnherohq"]
+
+[ext_resource type="PackedScene" uid="uid://bqw8ahthqpkjf" path="res://scenes/characters/character.tscn" id="1_6r73q"]
+[ext_resource type="PackedScene" path="res://scenes/skills/instigator_skill.tscn" id="2_skill"]
+
+[node name="Instigator" instance=ExtResource("1_6r73q")]
+skill_scene = ExtResource("2_skill")
